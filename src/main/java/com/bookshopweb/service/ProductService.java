@@ -1,12 +1,12 @@
 package com.bookshopweb.service;
 
 import com.bookshopweb.beans.CategoryBooks;
+import com.bookshopweb.beans.CategorySalesReport;
 import com.bookshopweb.beans.Product;
 import com.bookshopweb.dao.ProductDAO;
 import com.bookshopweb.utils.Protector;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProductService extends Service<Product, ProductDAO> implements ProductDAO {
@@ -120,6 +120,11 @@ public class ProductService extends Service<Product, ProductDAO> implements Prod
 	@Override
 	public List<CategoryBooks> getAllTotalBooksByCategory() {
 		return jdbi.withExtension(ProductDAO.class, dao -> dao.getAllTotalBooksByCategory());
+	}
+
+	@Override
+	public List<CategorySalesReport> getAllCategorySalesReport() {
+		return jdbi.withExtension(ProductDAO.class, dao -> dao.getAllCategorySalesReport());
 	}
 
 }

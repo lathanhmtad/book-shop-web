@@ -1,6 +1,9 @@
 package com.bookshopweb.servlet.admin;
 
+import com.bookshopweb.beans.Category;
+import com.bookshopweb.beans.CategorySalesReport;
 import com.bookshopweb.beans.Product;
+import com.bookshopweb.service.CategoryService;
 import com.bookshopweb.service.ProductService;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -22,22 +25,25 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-@WebServlet(name = "ReportAdminServlet", urlPatterns = {"/admin-report-books-sold", "/admin-report-book-sales"})
+@WebServlet(name = "ReportAdminServlet", urlPatterns = {"/admin-report-books-sold", "/category-sales-report"})
 public class ReportAdminServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
     private final ProductService productService = new ProductService();
+    private final CategoryService categoryService = new CategoryService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	 response.setCharacterEncoding("UTF-8");
-    	 response.setContentType("application/pdf");
-         response.setHeader("Content-Disposition", "attachment; filename=\"report.pdf\"");
-         
          String path = request.getServletPath();
+         
          if(path.equals("/admin-report-books-sold")) {
         	 try (OutputStream outputStream = response.getOutputStream()) {
+        		 response.setCharacterEncoding("UTF-8");
+            	 response.setContentType("application/pdf");
+                 response.setHeader("Content-Disposition", "attachment; filename=\"report.pdf\"");
+        		 
                  Document document = new Document();
                  PdfWriter.getInstance(document, outputStream);
                  document.open();
@@ -75,8 +81,12 @@ public class ReportAdminServlet extends HttpServlet {
                  e.printStackTrace();
              }
          }
-         else if(path.equals("/admin-report-book-sales")) {
-        	 
+         else if(path.equals("/category-sales-report")) {
+        	 List<CategorySalesReport> categorySalesReports = productService.getAllCategorySalesReport();
+        	 List<Category> categories = categoryService.getAll();
+        	 request.setAttribute("categorySalesReports", categorySalesReports);
+        	 request.setAttribute("categories", categories);
+        	 request.getRequestDispatcher("/WEB-INF/views/categorySelesReport.jsp").forward(request, response);
          }
     }
 

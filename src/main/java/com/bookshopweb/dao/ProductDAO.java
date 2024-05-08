@@ -1,6 +1,7 @@
 package com.bookshopweb.dao;
 
 import com.bookshopweb.beans.CategoryBooks;
+import com.bookshopweb.beans.CategorySalesReport;
 import com.bookshopweb.beans.Product;
 
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
@@ -12,7 +13,6 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RegisterBeanMapper(Product.class)
@@ -39,7 +39,11 @@ public interface ProductDAO extends DAO<Product> {
     @SqlQuery("SELECT * FROM product WHERE id = :id")
     Optional<Product> getById(@Bind("id") long id);
     
-    @SqlQuery("select p.id, p.name,p.quantity,p.totalBuy from product as p")
+    @SqlQuery("select p.id, p.name, p.quantity, oi.quantity as totalBuy\r\n"
+    		+ "from product as p\r\n"
+    		+ "join order_item as oi on oi.productId = p.id\r\n"
+    		+ "join orders as o on o.id = oi.orderId\r\n"
+    		+ "where o.status = 1")
     List<Product> getSimpleReportProduct();
     
     @Override
@@ -126,4 +130,18 @@ public interface ProductDAO extends DAO<Product> {
     		+ "GROUP BY c.id;")
     @RegisterBeanMapper(CategoryBooks.class)
     List<CategoryBooks> getAllTotalBooksByCategory();
+    
+    @SqlQuery("SELECT c.name AS categoryName,\r\n"
+    		+ "	   SUM(oi.quantity) as booksSold,\r\n"
+    		+ "       SUM(p.quantity) AS inventory,\r\n"
+    		+ "       SUM(oi.quantity * p.price - (100 - oi.discount) ) AS revenue\r\n"
+    		+ "FROM category c\r\n"
+    		+ "JOIN product_category pc ON c.id = pc.categoryid\r\n"
+    		+ "JOIN product p ON pc.productid = p.id\r\n"
+    		+ "LEFT JOIN order_item oi ON p.id = oi.productid\r\n"
+    		+ "LEFT JOIN orders o ON oi.orderid = o.id AND o.status = 1\r\n"
+    		+ "GROUP BY c.name\r\n"
+    		+ "")
+    @RegisterBeanMapper(CategorySalesReport.class)
+    List<CategorySalesReport> getAllCategorySalesReport();
 }

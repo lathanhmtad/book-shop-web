@@ -19,8 +19,8 @@
         <h1 class="display-5 mb-3">Quản lý Shop Bán Sách</h1>
         <div class="mb-3">
 	        <a href="${pageContext.request.contextPath}/admin-report-books-sold" class="btn btn-primary">In thông tin bán sách</a>
-	        <%-- <a href="${pageContext.request.contextPath}/admin-report-book-sales" class="btn btn-warning text-white">
-	        	In báo cáo doanh thu bán sách</a> --%>
+	        <a href="${pageContext.request.contextPath}/category-sales-report" class="btn btn-warning text-white">
+	        Báo cáo doanh thu sách theo thể loại</a>
 	    </div>
         <div class="row">
           <div class="col-6 col-lg-3">
